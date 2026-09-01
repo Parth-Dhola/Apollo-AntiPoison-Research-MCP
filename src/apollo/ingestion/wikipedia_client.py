@@ -146,3 +146,4 @@ async def fetch_wikipedia_article(title: str) -> Optional[Dict[str, Any]]:
         logger.error(f"Failed to fetch Wikipedia article {title}: {e}")
 
     return None
+

@@ -156,8 +156,20 @@ The sanitization pipeline protects LLMs from prompt injection and formatting cor
 
 3. **Grounded Snippet Packer (`snippet_packer.py`)**:
    - Combines the top-$K$ reranked snippets.
-   - Formats citation metadata (Title, Source, Authors, Year, Citations, Stars, Relevance Score).
-   - Generates clean Markdown blocks ready for LLM consumption.
+   - Formats citation metadata with explicit Source Authority badges:
+     - `🏛️ [Tier 1: Peer-Reviewed / Primary Academic Literature]` (arXiv, Semantic Scholar)
+     - `💻 [Tier 2: Verified Open-Source Code Implementation]` (GitHub)
+     - `📖 [Tier 3: Crowd-Sourced Encyclopedia — Secondary / Conceptual Reference]` (Wikipedia)
+     - `🌐 [Tier 4: General Web Search Context]` (DuckDuckGo)
+   - Generates clean, anti-poisoned Markdown blocks ready for LLM consumption.
+
+4. **Source Authority Hierarchy & Reranker Weighting (`reranker.py`)**:
+   - Applies credibility multipliers during Cross-Encoder reranking to ensure peer-reviewed science always outranks crowd-sourced summaries:
+     $$\text{Score}_{\text{weighted}} = \text{Score}_{\text{semantic}} \times \text{Weight}_{\text{authority}}$$
+     - **arXiv & Semantic Scholar**: $1.00\times$ (Full priority)
+     - **GitHub**: $0.90\times$ (Verified implementation)
+     - **Wikipedia**: $0.65\times$ (Demoted for deep research questions)
+     - **DuckDuckGo**: $0.55\times$ (General web context)
 
 ---
 

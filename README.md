@@ -128,6 +128,19 @@ Apollo ensures context retrieved from external sources is safe before reaching y
 
 ---
 
+## 🏛️ Source Authority & Credibility Hierarchy
+
+Apollo prevents unverified or crowd-sourced summaries from displacing peer-reviewed science:
+
+| Tier | Source | Authority Weight | Role in Research Queries |
+|---|---|---|---|
+| **Tier 1** | **arXiv & Semantic Scholar** | `1.00x` | **Primary Ground Truth**: Peer-reviewed proofs, theorems, SOTA benchmarks. |
+| **Tier 2** | **GitHub Repos** | `0.90x` | **Verified Code**: Runnable models, CUDA kernels, PyTorch modules. |
+| **Tier 3** | **Wikipedia** | `0.65x` | **Secondary Encyclopedia**: Definitions & rate-limit safety net (Deprioritized for research). |
+| **Tier 4** | **DuckDuckGo** | `0.55x` | **General Web**: Fallback for news and release notes. |
+
+---
+
 ## 🐳 Docker & Compose
 
 Run Apollo in Docker:

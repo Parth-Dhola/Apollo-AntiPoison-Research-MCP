@@ -60,6 +60,28 @@ class TestGuardrailRAG(unittest.TestCase):
         self.assertIn("FlashAttention", packed_output)
         self.assertIn("<untrusted_academic_context", packed_output)
         self.assertIn("Verified Safe", packed_output)
+        self.assertIn("Tier 1: Peer-Reviewed", packed_output)
+
+    def test_source_authority_weighting(self):
+        # Even with identical text content, arXiv (Tier 1, weight 1.0) must outrank Wikipedia (Tier 3, weight 0.65)
+        snippets = [
+            GroundedContextSnippet(
+                source="wikipedia",
+                title="Transformer Architecture - Wikipedia",
+                content="The Transformer is a deep learning architecture using self-attention mechanisms.",
+                citation_meta={}
+            ),
+            GroundedContextSnippet(
+                source="arxiv",
+                title="Attention Is All You Need - arXiv",
+                content="The Transformer is a deep learning architecture using self-attention mechanisms.",
+                citation_meta={"arxiv_id": "1706.03762"}
+            )
+        ]
+        ranked = rank_snippets("Transformer self-attention architecture", snippets, top_k=2)
+        self.assertEqual(ranked[0].source, "arxiv")
+        self.assertEqual(ranked[1].source, "wikipedia")
+        self.assertGreater(ranked[0].relevance_score, ranked[1].relevance_score)
 
 
 if __name__ == "__main__":

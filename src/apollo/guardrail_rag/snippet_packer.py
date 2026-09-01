@@ -69,6 +69,16 @@ def pack_grounded_snippets(
                 author_str = str(authors)
             meta_items.append(f"Authors: {author_str}")
 
+        # Authority Tier Tag
+        authority_badges = {
+            "arxiv": "🏛️ [Tier 1: Peer-Reviewed / Primary Academic Literature]",
+            "semantic_scholar": "🏛️ [Tier 1: Peer-Reviewed / Primary Academic Literature]",
+            "github": "💻 [Tier 2: Verified Open-Source Code Implementation]",
+            "wikipedia": "📖 [Tier 3: Crowd-Sourced Encyclopedia — Secondary / Conceptual Reference]",
+            "web": "🌐 [Tier 4: General Web Search Context]"
+        }
+        authority_tag = authority_badges.get(snippet.source, "General Context")
+
         meta_line = " | ".join(meta_items) if meta_items else "General Context"
         url_line = f"URL: {snippet.url}" if snippet.url else ""
 
@@ -76,8 +86,9 @@ def pack_grounded_snippets(
 
         block = (
             f"### Snippet {idx}: {snippet.title} ({snippet.source.upper()})\n"
+            f"- **Source Authority**: {authority_tag}\n"
             f"- **Metadata**: {meta_line}\n"
-            f"- **Status**: {status_tag} | Relevance: {snippet.relevance_score:.3f}\n"
+            f"- **Status**: {status_tag} | Weighted Relevance: {snippet.relevance_score:.3f}\n"
             f"{f'- **Link**: {url_line}' if url_line else ''}\n\n"
             f"{wrap_in_secure_xml(sanitized_content, source=snippet.source, identifier=snippet.title)}"
         )
