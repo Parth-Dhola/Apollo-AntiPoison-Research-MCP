@@ -40,7 +40,7 @@ Apollo acts as an intelligent, secure, zero-cost retrieval firewall between raw 
 │                        Apollo MCP Server Pipeline                      │
 │                                                                        │
 │   ┌────────────────────────────────────────────────────────────────┐   │
-│   │ 1. Multi-Source Ingestion & Standalone Tool Selector           │   │
+│   │ 1. Multi-Source Ingestion & Tool Capability RAG Indexer        │   │
 │   │    ├─ arXiv Atom API (100% Free / Public XML parser)           │   │
 │   │    ├─ Semantic Scholar Graph API (Free Tier Public Endpoint)   │   │
 │   │    ├─ GitHub REST API (Public Repos & Code Search)             │   │
@@ -71,6 +71,7 @@ Apollo acts as an intelligent, secure, zero-cost retrieval firewall between raw 
        • `fetch_paper_deep_context(arxiv_id, max_tokens)`
        • `search_repo_implementations(topic, language, min_stars, top_k)`
        • `fallback_web_search(query, max_results)`
+       • `match_tools_for_query(query, max_tools)`
        • `unified_research_context(query, top_k)`
 ```
 
