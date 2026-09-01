@@ -3,7 +3,7 @@
 [![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
-[![Tests](https://img.shields.io/badge/tests-19%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![Tests](https://img.shields.io/badge/tests-23%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
 [![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
 [![Cost](https://img.shields.io/badge/Cost-%240%20(100%25%20Free)-brightgreen.svg)](#zero-cost-design)
 
@@ -18,7 +18,7 @@
 │                        Apollo MCP Server (Standalone)                  │
 │                                                                        │
 │   ┌────────────────────────────────────────────────────────────────┐   │
-│   │ 1. Multi-Source Ingestion & Standalone Tool Selector           │   │
+│   │ 1. Multi-Source Ingestion & Tool Capability RAG Indexer        │   │
 │   │    ├─ arXiv Atom API (100% Free / Public XML parser)           │   │
 │   │    ├─ Semantic Scholar Graph API (Free Tier Public Endpoint)   │   │
 │   │    ├─ GitHub REST API (Public Repos & Code Search)             │   │
@@ -49,6 +49,7 @@
        • `fetch_paper_deep_context(arxiv_id, max_tokens)`
        • `search_repo_implementations(topic, language, min_stars, top_k)`
        • `fallback_web_search(query, max_results)`
+       • `match_tools_for_query(query, max_tools)`
        • `unified_research_context(query, top_k)`
 ```
 

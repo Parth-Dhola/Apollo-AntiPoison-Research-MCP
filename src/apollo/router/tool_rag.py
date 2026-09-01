@@ -174,3 +174,4 @@ _global_tool_rag = ToolRAGSelector()
 def rank_tools_for_query(query: str, max_tools: int = 2) -> List[Dict[str, Any]]:
     """Convenience function for RAG-based tool selection."""
     return _global_tool_rag.select_tools(query, max_tools=max_tools)
+

@@ -266,20 +266,21 @@ npx @modelcontextprotocol/inspector /opt/anaconda3/envs/apollo/bin/python -m apo
 | `fetch_paper_deep_context` | `arxiv_id: str`<br>`max_tokens: int` | `str` (Markdown) | Fetches structured metadata, authors, PDF links, and normalized equations for a specific arXiv ID. |
 | `search_repo_implementations` | `topic: str`<br>`language: Optional[str]`<br>`min_stars: int`<br>`top_k: int` | `str` (Markdown) | Searches GitHub repositories, strips license boilerplate, and extracts sanitized code/README snippets. |
 | `fallback_web_search` | `query: str`<br>`max_results: int` | `str` (Markdown) | Keyless DuckDuckGo web search fallback for news, docs, and releases. |
-| `unified_research_context` | `query: str`<br>`top_k: int` | `str` (Markdown) | **Flagship Engine**: Classifies intent $\rightarrow$ Multi-source ingest $\rightarrow$ Anti-poison $\rightarrow$ FlashRank rerank. |
+| `match_tools_for_query` | `query: str`<br>`max_tools: int` | `str` (Markdown) | Evaluates Tool Capability RAG to inspect which tools match and why others were pruned. |
+| `unified_research_context` | `query: str`<br>`top_k: int` | `str` (Markdown) | **Flagship Engine**: Tool Capability RAG $\rightarrow$ Selective Ingest $\rightarrow$ Anti-poison $\rightarrow$ FlashRank Rerank. |
 
 ---
 
 ## 6. Automated Testing & CI/CD Pipeline
 
-Apollo features a 19-case automated Pytest suite covering all pipeline layers:
+Apollo features a 23-case automated Pytest suite covering all pipeline layers:
 
 ```bash
 conda run -n apollo pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 ```
 
 ### GitHub Actions Workflow (`.github/workflows/ci-cd.yml`):
-1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 19 test cases and measures code coverage.
+1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 23 test cases and measures code coverage.
 2. **Build & Push Job**: Automatically builds the multi-stage Docker image and pushes to Docker Hub on `main` branch pushes.
 3. **Deploy Job**: Connects to AWS EC2 via SSH and executes `docker compose pull && docker compose up -d`.
 
