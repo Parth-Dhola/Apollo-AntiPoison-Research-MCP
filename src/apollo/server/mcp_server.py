@@ -11,6 +11,7 @@ from apollo.ingestion.arxiv_client import search_arxiv, fetch_arxiv_paper
 from apollo.ingestion.semantic_scholar import search_semantic_scholar
 from apollo.ingestion.github_client import search_github_repos
 from apollo.ingestion.web_search import search_duckduckgo
+from apollo.ingestion.wikipedia_client import search_wikipedia as search_wikipedia_fn, fetch_wikipedia_article
 from apollo.guardrail_rag.reranker import rank_snippets
 from apollo.guardrail_rag.snippet_packer import pack_grounded_snippets
 from apollo.models.schemas import (
@@ -150,7 +151,35 @@ def create_mcp_server() -> FastMCP:
         ranked = rank_snippets(topic, candidate_snippets, top_k=top_k)
         return pack_grounded_snippets(ranked)
 
-    # ── Tool 4: DuckDuckGo Fallback Search ─────────────────────────────────────
+    # ── Tool 4: Wikipedia Encyclopedia Search ─────────────────────────────────
+    @mcp.tool()
+    async def search_wikipedia(
+        query: str,
+        max_results: int = 3
+    ) -> str:
+        """
+        Search Wikipedia encyclopedia for foundational definitions, algorithms, mathematical concepts, and historical context.
+        Generous rate limits, 100% free, ideal for reliable conceptual overviews.
+        """
+        results = await search_wikipedia_fn(query, max_results=max_results)
+        if not results:
+            return f"No Wikipedia articles found for: {query}"
+
+        candidate_snippets = [
+            GroundedContextSnippet(
+                source="wikipedia",
+                title=r["title"],
+                url=r["url"],
+                content=f"{r.get('description', '')}\n\n{r['content']}".strip(),
+                citation_meta={"source": "wikipedia"}
+            )
+            for r in results
+        ]
+
+        ranked = rank_snippets(query, candidate_snippets, top_k=max_results)
+        return pack_grounded_snippets(ranked)
+
+    # ── Tool 5: DuckDuckGo Fallback Search ─────────────────────────────────────
     @mcp.tool()
     async def fallback_web_search(
         query: str,
@@ -178,7 +207,7 @@ def create_mcp_server() -> FastMCP:
         ranked = rank_snippets(query, candidate_snippets, top_k=max_results)
         return pack_grounded_snippets(ranked)
 
-    # ── Tool 5: Tool Capability RAG Inspector ──────────────────────────────────
+    # ── Tool 6: Tool Capability RAG Inspector ──────────────────────────────────
     @mcp.tool()
     async def match_tools_for_query(
         query: str,
@@ -196,7 +225,7 @@ def create_mcp_server() -> FastMCP:
             lines.append(f"- **Selection Reason**: {t['reason']}\n")
         return "\n".join(lines)
 
-    # ── Tool 6: Unified Context Engine with Adaptive Tool Budgeting ────────────
+    # ── Tool 7: Unified Context Engine with Adaptive Tool Budgeting ────────────
     @mcp.tool()
     async def unified_research_context(
         query: str,
@@ -230,6 +259,9 @@ def create_mcp_server() -> FastMCP:
 
         if "search_repo_implementations" in selected_tool_names:
             tasks.append(search_github_repos(topic=query, per_page=top_k))
+
+        if "search_wikipedia" in selected_tool_names:
+            tasks.append(search_wikipedia_fn(query, max_results=top_k))
 
         if "fallback_web_search" in selected_tool_names or not tasks:
             ddg_results = search_duckduckgo(query, max_results=top_k)

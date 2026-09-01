@@ -48,8 +48,15 @@ async def run_live_demo():
     repo_res = await repo_tool.run({"topic": "flash-attention", "language": "python", "top_k": 1})
     print(get_text(repo_res))
 
-    # ── 4. Unified Anti-Poisoned RAG & CPU Reranker ───────────────────────────
-    print("\n[4] TESTING UNIFIED CONTEXT ENGINE (Router + arXiv + Anti-Poison + Rerank)")
+    # ── 4. Wikipedia Encyclopedia Search (Foundational Knowledge) ─────────────
+    print("\n[4] TESTING WIKIPEDIA ENCYCLOPEDIA (Concept: Backpropagation)")
+    print("-" * 70)
+    wiki_tool = await server.get_tool("search_wikipedia")
+    wiki_res = await wiki_tool.run({"query": "Backpropagation neural networks", "max_results": 1})
+    print(get_text(wiki_res))
+
+    # ── 5. Unified Anti-Poisoned RAG & CPU Reranker ───────────────────────────
+    print("\n[5] TESTING UNIFIED CONTEXT ENGINE (Router + Ingestion + Anti-Poison + Rerank)")
     print("-" * 70)
     query = "How does FlashAttention-2 speed up forward and backward pass?"
     unified_tool = await server.get_tool("unified_research_context")

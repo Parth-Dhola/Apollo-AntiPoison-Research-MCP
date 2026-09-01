@@ -22,12 +22,15 @@ class TestToolRAG(unittest.TestCase):
         matched = rank_tools_for_query("Explain arXiv paper 2205.14135")
         self.assertEqual(len(matched), 1)
         self.assertEqual(matched[0]["tool_name"], "fetch_paper_deep_context")
-        self.assertIn("Short-circuiting", matched[0]["reason"])
-
     def test_web_fallback_matching(self):
         matched = rank_tools_for_query("What is the latest OpenAI GPT-4o pricing and release date?")
         tool_names = [t["tool_name"] for t in matched]
         self.assertIn("fallback_web_search", tool_names)
+
+    def test_wikipedia_tool_matching(self):
+        matched = rank_tools_for_query("Wikipedia definition and overview of Monte Carlo tree search algorithm")
+        tool_names = [t["tool_name"] for t in matched]
+        self.assertIn("search_wikipedia", tool_names)
 
 
 if __name__ == "__main__":

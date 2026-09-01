@@ -28,6 +28,7 @@ class TestMCPTools(unittest.TestCase):
             self.assertIn("search_academic_papers", tool_names)
             self.assertIn("fetch_paper_deep_context", tool_names)
             self.assertIn("search_repo_implementations", tool_names)
+            self.assertIn("search_wikipedia", tool_names)
             self.assertIn("fallback_web_search", tool_names)
             self.assertIn("match_tools_for_query", tool_names)
             self.assertIn("unified_research_context", tool_names)

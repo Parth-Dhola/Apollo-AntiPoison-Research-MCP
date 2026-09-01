@@ -74,6 +74,20 @@ _TOOL_PROFILES: List[ToolProfile] = [
         min_score_threshold=0.30
     ),
     ToolProfile(
+        name="search_wikipedia",
+        description="Search Wikipedia encyclopedia for foundational definitions, mathematical concepts, algorithms, biographies, historical background, and high-level conceptual overviews without rate limits.",
+        keywords=["wikipedia", "wiki", "definition", "concept", "what is", "overview", "history", "algorithm", "biography", "background", "encyclopedia", "who was", "origin"],
+        sample_queries=[
+            "What is Backpropagation through time?",
+            "Definition of Monte Carlo tree search",
+            "History of Transformer neural networks",
+            "Who is Geoffrey Hinton?"
+        ],
+        category="encyclopedia",
+        token_cost="low",
+        min_score_threshold=0.25
+    ),
+    ToolProfile(
         name="fallback_web_search",
         description="Fallback search for recent tech news, product launches, pricing, documentation, tutorials, and general web information.",
         keywords=["news", "latest", "recent", "release", "released", "announced", "launch", "today", "pricing", "cost", "documentation", "guide", "tutorial", "blog", "founder", "ceo"],

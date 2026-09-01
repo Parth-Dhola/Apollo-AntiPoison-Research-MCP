@@ -44,6 +44,7 @@ Apollo acts as an intelligent, secure, zero-cost retrieval firewall between raw 
 │   │    ├─ arXiv Atom API (100% Free / Public XML parser)           │   │
 │   │    ├─ Semantic Scholar Graph API (Free Tier Public Endpoint)   │   │
 │   │    ├─ GitHub REST API (Public Repos & Code Search)             │   │
+│   │    ├─ Wikipedia API (100% Free / Foundational Concepts)        │   │
 │   │    └─ DuckDuckGo Fallback Search (Zero API Keys)               │   │
 │   └───────────────────────────────┬────────────────────────────────┘   │
 │                                   │                                    │
@@ -70,6 +71,7 @@ Apollo acts as an intelligent, secure, zero-cost retrieval firewall between raw 
        • `search_academic_papers(query, year_start, year_end, min_citations, top_k)`
        • `fetch_paper_deep_context(arxiv_id, max_tokens)`
        • `search_repo_implementations(topic, language, min_stars, top_k)`
+       • `search_wikipedia(query, max_results)`
        • `fallback_web_search(query, max_results)`
        • `match_tools_for_query(query, max_tools)`
        • `unified_research_context(query, top_k)`
@@ -97,7 +99,11 @@ Apollo acts as an intelligent, secure, zero-cost retrieval firewall between raw 
    - Fetches raw README previews directly from `raw.githubusercontent.com` to conserve API token quotas.
    - Tracks repository stars, primary programming languages, and file paths.
 
-4. **DuckDuckGo Fallback Client (`web_search.py`)**:
+4. **Wikipedia Encyclopedia Client (`wikipedia_client.py`)**:
+   - Queries `https://en.wikipedia.org/w/api.php` and `https://en.wikipedia.org/api/rest_v1/page/summary` for foundational definitions and overviews.
+   - High rate limit resilience, zero API keys required, ideal for conceptual groundings when search engines throttle.
+
+5. **DuckDuckGo Fallback Client (`web_search.py`)**:
    - Provides 100% free, keyless fallback search for recent news, product announcements, and documentation.
 
 ---
@@ -266,6 +272,7 @@ npx @modelcontextprotocol/inspector /opt/anaconda3/envs/apollo/bin/python -m apo
 | `search_academic_papers` | `query: str`<br>`year_start: Optional[int]`<br>`year_end: Optional[int]`<br>`min_citations: int`<br>`top_k: int` | `str` (Markdown) | Searches arXiv & Semantic Scholar in parallel, filters and reranks paper abstracts. |
 | `fetch_paper_deep_context` | `arxiv_id: str`<br>`max_tokens: int` | `str` (Markdown) | Fetches structured metadata, authors, PDF links, and normalized equations for a specific arXiv ID. |
 | `search_repo_implementations` | `topic: str`<br>`language: Optional[str]`<br>`min_stars: int`<br>`top_k: int` | `str` (Markdown) | Searches GitHub repositories, strips license boilerplate, and extracts sanitized code/README snippets. |
+| `search_wikipedia` | `query: str`<br>`max_results: int` | `str` (Markdown) | Searches Wikipedia encyclopedia for foundational definitions, algorithms, and concepts with generous rate limits. |
 | `fallback_web_search` | `query: str`<br>`max_results: int` | `str` (Markdown) | Keyless DuckDuckGo web search fallback for news, docs, and releases. |
 | `match_tools_for_query` | `query: str`<br>`max_tools: int` | `str` (Markdown) | Evaluates Tool Capability RAG to inspect which tools match and why others were pruned. |
 | `unified_research_context` | `query: str`<br>`top_k: int` | `str` (Markdown) | **Flagship Engine**: Tool Capability RAG $\rightarrow$ Selective Ingest $\rightarrow$ Anti-poison $\rightarrow$ FlashRank Rerank. |
@@ -274,14 +281,14 @@ npx @modelcontextprotocol/inspector /opt/anaconda3/envs/apollo/bin/python -m apo
 
 ## 6. Automated Testing & CI/CD Pipeline
 
-Apollo features a 23-case automated Pytest suite covering all pipeline layers:
+Apollo features a 26-case automated Pytest suite covering all pipeline layers:
 
 ```bash
 conda run -n apollo pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 ```
 
 ### GitHub Actions Workflow (`.github/workflows/ci-cd.yml`):
-1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 23 test cases and measures code coverage.
+1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 26 test cases and measures code coverage.
 2. **Build & Push Job**: Automatically builds the multi-stage Docker image and pushes to Docker Hub on `main` branch pushes.
 3. **Deploy Job**: Connects to AWS EC2 via SSH and executes `docker compose pull && docker compose up -d`.
 
