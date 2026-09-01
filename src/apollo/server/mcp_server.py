@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import time
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
 from fastmcp import FastMCP
 
 from apollo.config import get_settings
@@ -18,7 +18,7 @@ from apollo.models.schemas import (
     QueryIntent,
     ResearchContextResult
 )
-from apollo.router.tool_selector import select_tools_for_query
+from apollo.router.tool_rag import rank_tools_for_query
 from apollo.sanitization.anti_poison import sanitize_untrusted_text, wrap_in_secure_xml
 from apollo.sanitization.normalizer import normalize_latex_and_markdown
 
@@ -44,13 +44,11 @@ def create_mcp_server() -> FastMCP:
         """
         year_range = (year_start, year_end) if year_start and year_end else None
 
-        # Fetch in parallel from arXiv and Semantic Scholar
         arxiv_task = search_arxiv(query, max_results=top_k)
         s2_task = search_semantic_scholar(query, limit=top_k, min_citations=min_citations, year_range=year_range)
 
         arxiv_papers, s2_papers = await asyncio.gather(arxiv_task, s2_task)
 
-        # Convert to GroundedContextSnippet
         candidate_snippets: List[GroundedContextSnippet] = []
 
         for p in arxiv_papers:
@@ -83,7 +81,6 @@ def create_mcp_server() -> FastMCP:
         if not candidate_snippets:
             return "No academic papers found matching the query."
 
-        # Rerank with FlashRank/BM25
         ranked = rank_snippets(query, candidate_snippets, top_k=top_k)
         return pack_grounded_snippets(ranked)
 
@@ -181,32 +178,60 @@ def create_mcp_server() -> FastMCP:
         ranked = rank_snippets(query, candidate_snippets, top_k=max_results)
         return pack_grounded_snippets(ranked)
 
-    # ── Tool 5: Unified Context Engine (Flagship Router + Filter) ──────────────
+    # ── Tool 5: Tool Capability RAG Inspector ──────────────────────────────────
+    @mcp.tool()
+    async def match_tools_for_query(
+        query: str,
+        max_tools: int = 2
+    ) -> str:
+        """
+        RAG over Tool Capabilities: Evaluates semantic capability fit to pick ONLY necessary tools,
+        pruning irrelevant tools to prevent token bloat and context overload.
+        """
+        selected_tools = rank_tools_for_query(query, max_tools=max_tools)
+        lines = [f"# Tool Selection RAG for: \"{query}\""]
+        for idx, t in enumerate(selected_tools, 1):
+            lines.append(f"### {idx}. `{t['tool_name']}` (Score: {t['score']:.2f})")
+            lines.append(f"- **Category**: {t.get('category', 'general')} | **Token Cost**: {t.get('token_cost', 'medium')}")
+            lines.append(f"- **Selection Reason**: {t['reason']}\n")
+        return "\n".join(lines)
+
+    # ── Tool 6: Unified Context Engine with Adaptive Tool Budgeting ────────────
     @mcp.tool()
     async def unified_research_context(
         query: str,
-        top_k: int = 3
+        top_k: int = 2
     ) -> str:
         """
-        End-to-end multi-source research context pipeline.
-        1. Classifies intent using local zero-cost Bag-of-Words router.
-        2. Aggregates candidates from arXiv, Semantic Scholar, GitHub, and Web.
-        3. Filters prompt injections and normalizes LaTeX math.
-        4. Reranks with FlashRank/BM25 and returns dense grounded context.
+        End-to-end multi-source research context pipeline with Tool Capability RAG & Token Budgeting.
+        1. RAG-selects ONLY the top 1-2 optimal tools based on semantic capability match.
+        2. Prunes unneeded tools to prevent API waste and context overload.
+        3. Sanitizes all retrieved snippets and removes prompt injection payloads.
+        4. Cross-encoder reranks on CPU and returns bounded, dense grounded context.
         """
         start_time = time.time()
-        selection = select_tools_for_query(query)
+        
+        # 1. RAG Tool Selection
+        tool_matches = rank_tools_for_query(query, max_tools=2)
+        selected_tool_names = [t["tool_name"] for t in tool_matches]
 
         tasks = []
-        if selection.intent in (QueryIntent.ACADEMIC_PAPER, QueryIntent.DEEP_THEORY, QueryIntent.HYBRID):
+        if "fetch_paper_deep_context" in selected_tool_names:
+            # Exact arXiv ID short-circuit
+            import re
+            m = re.search(r"\b\d{4}\.\d{4,5}(?:v\d+)?\b", query)
+            if m:
+                deep_ctx = await fetch_paper_deep_context(m.group(0))
+                return deep_ctx
+
+        if "search_academic_papers" in selected_tool_names:
             tasks.append(search_arxiv(query, max_results=top_k))
             tasks.append(search_semantic_scholar(query, limit=top_k))
 
-        if selection.intent in (QueryIntent.CODE_IMPLEMENTATION, QueryIntent.HYBRID):
+        if "search_repo_implementations" in selected_tool_names:
             tasks.append(search_github_repos(topic=query, per_page=top_k))
 
-        if selection.intent == QueryIntent.GENERAL_WEB or not tasks:
-            # Fallback web search
+        if "fallback_web_search" in selected_tool_names or not tasks:
             ddg_results = search_duckduckgo(query, max_results=top_k)
             candidates = [
                 GroundedContextSnippet(
@@ -221,7 +246,7 @@ def create_mcp_server() -> FastMCP:
             ranked = rank_snippets(query, candidates, top_k=top_k)
             return pack_grounded_snippets(ranked)
 
-        # Execute parallel ingestion
+        # Execute parallel ingestion for ONLY selected tools
         ingestion_results = await asyncio.gather(*tasks, return_exceptions=True)
 
         candidates: List[GroundedContextSnippet] = []
@@ -257,7 +282,7 @@ def create_mcp_server() -> FastMCP:
                     ))
 
         if not candidates:
-            # Fallback to web search
+            # Graceful fallback to web search
             ddg_results = search_duckduckgo(query, max_results=top_k)
             candidates = [
                 GroundedContextSnippet(
@@ -270,17 +295,16 @@ def create_mcp_server() -> FastMCP:
                 for r in ddg_results
             ]
 
-        # Rerank with FlashRank/BM25
+        # Rerank with FlashRank/BM25 & enforce token budget
         ranked = rank_snippets(query, candidates, top_k=top_k)
-        packed_text = pack_grounded_snippets(ranked)
+        packed_text = pack_grounded_snippets(ranked, max_total_chars=2500)
 
         latency_ms = (time.time() - start_time) * 1000
         summary_header = (
-            f"<!-- Apollo Context Engine | Intent: {selection.intent.value} "
-            f"| Confidence: {selection.confidence * 100:.0f}% | Latency: {latency_ms:.1f}ms -->\n\n"
+            f"<!-- Apollo Context Engine | Tool RAG: {', '.join(selected_tool_names)} "
+            f"| Latency: {latency_ms:.1f}ms | Budget: Bounded -->\n\n"
         )
 
         return summary_header + packed_text
 
     return mcp
-

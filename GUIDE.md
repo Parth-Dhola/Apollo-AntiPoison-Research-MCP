@@ -282,3 +282,4 @@ conda run -n apollo pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 19 test cases and measures code coverage.
 2. **Build & Push Job**: Automatically builds the multi-stage Docker image and pushes to Docker Hub on `main` branch pushes.
 3. **Deploy Job**: Connects to AWS EC2 via SSH and executes `docker compose pull && docker compose up -d`.
+
