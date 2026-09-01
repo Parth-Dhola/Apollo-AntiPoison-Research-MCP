@@ -44,7 +44,7 @@
 │                                   │                                    │
 └───────────────────────────────────┼────────────────────────────────────┘
                                     ▼
-       Exposes Clean Tools to Aurora / Claude / Cursor / Antigravity:
+       Exposes Clean Tools to AI Agents / Claude / Cursor / Antigravity:
        • `search_academic_papers(query, year_start, year_end, min_citations, top_k)`
        • `fetch_paper_deep_context(arxiv_id, max_tokens)`
        • `search_repo_implementations(topic, language, min_stars, top_k)`
@@ -71,9 +71,9 @@ Apollo was designed specifically for students and researchers:
 git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP.git
 cd Apollo-AntiPoison-Research-MCP
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate
+# Create conda environment
+conda create -n apollo python=3.11 -y
+conda activate apollo
 
 # Install dependencies
 pip install -r requirements.txt
@@ -150,26 +150,27 @@ pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 
 ---
 
-## 🔗 Aurora CRAG Integration
+## 🔗 Python SDK & Agent Integration
 
-To use Apollo as the academic research engine in Aurora's CRAG agent ([`crag_agent.py`](file:///Users/apple/Downloads/aurora-final/backend/services/crag_agent.py)):
+To call Apollo directly in your AI agentic workflows or Python scripts:
 
 ```python
-from apollo.server.mcp_server import create_mcp_server
 import asyncio
+from apollo.server.mcp_server import create_mcp_server
 
-# In Aurora's fallback / research node:
-async def fetch_apollo_context(query: str):
+async def get_clean_research_context(query: str):
     server = create_mcp_server()
-    # Call unified_research_context tool directly or via MCP client
-    tool = server.get_tool("unified_research_context")
-    context = await tool.run({"query": query, "top_k": 3})
-    return context
+    tool = await server.get_tool("unified_research_context")
+    result = await tool.run({"query": query, "top_k": 3})
+    return result.content[0].text
+
+# Run
+context = asyncio.run(get_clean_research_context("FlashAttention-2 forward backward pass"))
+print(context)
 ```
 
 ---
 
 ## 📜 License
 
-MIT License. Free to use, modify, and distribute.
-
+MIT License. Free to use, modify, and distribute. See [LICENSE](LICENSE) for details.
