@@ -1,0 +1,110 @@
+name: Apollo CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  # ── Job 1: Pytest Suite & Coverage ───────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run tests with coverage
+        run: pytest tests/ -v --cov=src/apollo --cov-report=term-missing
+        env:
+          CACHE_DIR: /tmp/apollo_test_cache
+
+  # ── Job 2: Build & Push Docker Image ────────────────────────────────────
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if Docker Hub credentials are set
+        id: check_docker
+        run: |
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ] || [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ DOCKERHUB_USERNAME or DOCKERHUB_TOKEN not set — skipping Docker build/push"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to Docker Hub
+        if: steps.check_docker.outputs.skip == 'false'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: steps.check_docker.outputs.skip == 'false'
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push Apollo MCP image
+        if: steps.check_docker.outputs.skip == 'false'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/apollo-mcp:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/apollo-mcp:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Job 3: Deploy to AWS EC2 ─────────────────────────────────────────────
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check if EC2 is configured
+        id: check_ec2
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ EC2_HOST not set — skipping deploy (add EC2_HOST + EC2_SSH_KEY secrets to enable)"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: SSH into EC2 and redeploy
+        if: steps.check_ec2.outputs.skip == 'false'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/apollo
+            git pull origin main
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker system prune -f
+            echo "✅ Deployed Apollo MCP Server at $(date)"
+

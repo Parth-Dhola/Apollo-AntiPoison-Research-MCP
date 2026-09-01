@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  apollo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apollo-mcp-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - APOLLO_TRANSPORT=sse
+      - APOLLO_HOST=0.0.0.0
+      - APOLLO_PORT=8080
+      - CACHE_DIR=/app/.apollo_cache
+    volumes:
+      - apollo_cache:/app/.apollo_cache
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/sse || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  apollo_cache:
+

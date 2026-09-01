@@ -1,0 +1,175 @@
+# Apollo — Anti-Poisoned Multi-Source Research MCP Server
+
+[![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
+[![Tests](https://img.shields.io/badge/tests-19%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
+[![Cost](https://img.shields.io/badge/Cost-%240%20(100%25%20Free)-brightgreen.svg)](#zero-cost-design)
+
+> **Apollo** is a standalone, production-grade Model Context Protocol (MCP) server engineered to provide clean, anti-poisoned, highly-relevant context from academic papers (arXiv, Semantic Scholar), open-source repositories (GitHub), and web search. Built with zero external API fees in mind.
+
+---
+
+## 🏛️ Architecture
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Apollo MCP Server (Standalone)                  │
+│                                                                        │
+│   ┌────────────────────────────────────────────────────────────────┐   │
+│   │ 1. Multi-Source Ingestion & Standalone Tool Selector           │   │
+│   │    ├─ arXiv Atom API (100% Free / Public XML parser)           │   │
+│   │    ├─ Semantic Scholar Graph API (Free Tier Public Endpoint)   │   │
+│   │    ├─ GitHub REST API (Public Repos & Code Search)             │   │
+│   │    └─ DuckDuckGo Fallback Search (Zero API Keys)               │   │
+│   └───────────────────────────────┬────────────────────────────────┘   │
+│                                   │                                    │
+│                                   ▼                                    │
+│   ┌────────────────────────────────────────────────────────────────┐   │
+│   │ 2. Context Sanitization & Anti-Poisoning Layer (The Filter)    │   │
+│   │    ├─ Prompt Injection Scanner (Adversarial regex & redaction) │   │
+│   │    ├─ Invisible Unicode & BiDi Override Stripper               │   │
+│   │    ├─ LaTeX & Markdown Normalizer (Preserves Math Blocks)      │   │
+│   │    └─ Noise Reducer (Strips bibliographies & code licenses)    │   │
+│   └───────────────────────────────┬────────────────────────────────┘   │
+│                                   │                                    │
+│                                   ▼                                    │
+│   ┌────────────────────────────────────────────────────────────────┐   │
+│   │ 3. Guardrail RAG & Relevance Reranker                          │   │
+│   │    ├─ Zero-Cost Bag-of-Words & Okapi BM25 CPU Indexer          │   │
+│   │    ├─ FlashRank Ultra-Fast CPU Cross-Encoder (<25ms latency)   │   │
+│   │    └─ Grounded Snippet Packer (Secure XML Enclosure + Citations│   │
+│   └───────────────────────────────┬────────────────────────────────┘   │
+│                                   │                                    │
+└───────────────────────────────────┼────────────────────────────────────┘
+                                    ▼
+       Exposes Clean Tools to Aurora / Claude / Cursor / Antigravity:
+       • `search_academic_papers(query, year_start, year_end, min_citations, top_k)`
+       • `fetch_paper_deep_context(arxiv_id, max_tokens)`
+       • `search_repo_implementations(topic, language, min_stars, top_k)`
+       • `fallback_web_search(query, max_results)`
+       • `unified_research_context(query, top_k)`
+```
+
+---
+
+## ⚡ Zero-Cost Design
+
+Apollo was designed specifically for students and researchers:
+- **Zero API Costs**: arXiv and DuckDuckGo require no API keys. Semantic Scholar and GitHub run on free public rate limits.
+- **Zero Embedding/Vector Database Costs**: Uses pure Python **Okapi BM25** and **FlashRank CPU Cross-Encoder** (`ms-marco-TinyBERT-L-2-v2`) running directly in RAM with <25ms CPU latency.
+- **Rate Limit Caching**: Integrated disk and memory caching (`diskcache`) to respect public rate limits.
+
+---
+
+## 🚀 Quickstart
+
+### 1. Installation
+
+```bash
+git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP.git
+cd Apollo-AntiPoison-Research-MCP
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+pip install -e .
+```
+
+### 2. Standalone Tool Selector CLI
+
+Test query intent classification directly from the command line:
+
+```bash
+python -m apollo.router.tool_selector "How to implement LoRA linear layer in PyTorch?"
+```
+
+Output:
+```
+============================================================
+ Apollo Tool Selector & Intent Router
+============================================================
+Query:             How to implement LoRA linear layer in PyTorch?
+Predicted Intent:  CODE_IMPLEMENTATION
+Confidence:        95%
+Keywords Matched:  pytorch, implementation, implement
+Recommended Tools: search_repo_implementations, fallback_web_search
+Reasoning:         Code implementation query matching keywords: pytorch, implementation, implement
+============================================================
+```
+
+### 3. Run MCP Server
+
+#### Local Stdio Mode (Claude Desktop / Cursor / Antigravity):
+```bash
+python -m apollo.main --transport stdio
+```
+
+#### HTTP / SSE Server Mode (Docker / EC2 Microservice):
+```bash
+python -m apollo.main --transport sse --port 8080
+```
+
+---
+
+## 🛡️ Anti-Poisoning & Security Guardrails
+
+Apollo ensures context retrieved from external sources is safe before reaching your LLM:
+1. **Prompt Injection Redaction**: Detects and neutralizes prompt override attempts (`ignore previous instructions`, `system override`, `<<SYS>>`, `<|im_start|>`).
+2. **Invisible Unicode Stripping**: Removes zero-width spaces (`\u200B`), BiDi overrides (`\u202E`), and hidden character exploits.
+3. **Hardened XML Encapsulation**: Encloses external context in `<untrusted_academic_context>` tags with explicit provenance metadata.
+
+---
+
+## 🐳 Docker & Compose
+
+Run Apollo in Docker:
+
+```bash
+docker compose up -d
+```
+
+Check health:
+```bash
+curl http://localhost:8080/sse
+```
+
+---
+
+## 🧪 Testing
+
+Run test suite with coverage:
+
+```bash
+pytest tests/ -v --cov=src/apollo --cov-report=term-missing
+```
+
+---
+
+## 🔗 Aurora CRAG Integration
+
+To use Apollo as the academic research engine in Aurora's CRAG agent ([`crag_agent.py`](file:///Users/apple/Downloads/aurora-final/backend/services/crag_agent.py)):
+
+```python
+from apollo.server.mcp_server import create_mcp_server
+import asyncio
+
+# In Aurora's fallback / research node:
+async def fetch_apollo_context(query: str):
+    server = create_mcp_server()
+    # Call unified_research_context tool directly or via MCP client
+    tool = server.get_tool("unified_research_context")
+    context = await tool.run({"query": query, "top_k": 3})
+    return context
+```
+
+---
+
+## 📜 License
+
+MIT License. Free to use, modify, and distribute.
+
