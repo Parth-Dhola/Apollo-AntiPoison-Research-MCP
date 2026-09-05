@@ -119,12 +119,35 @@ python -m apollo.main --transport sse --port 8080
 
 ---
 
-## 🛡️ Anti-Poisoning & Security Guardrails
+## 🛡️ Dual-Pillar Defense Architecture
 
+Apollo solves the two fundamental failure modes of AI Agent retrieval: **Security Hijacking (Context Poisoning)** and **Model Hallucination (Context Overload)**.
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                          APOLLO DUAL-PILLAR SHIELD                     │
+├───────────────────────────────────┬────────────────────────────────────┤
+│ PILLAR 1: Security Firewall       │ PILLAR 2: Anti-Hallucination Guard │
+├───────────────────────────────────┼────────────────────────────────────┤
+│ • Prompt Injection Scanner        │ • Adaptive Tool Gating (Tool RAG)  │
+│ • Invisible Unicode Stripper      │ • Anti-Context Bloat Pruning       │
+│ • LaTeX / Markdown Normalizer     │ • "Lost-in-the-Middle" Prevention  │
+│ • Hardened XML Isolation Tags     │ • Hard Token Budgeting (<2500 ch)  │
+│ • Academic Noise / License Strip  │ • FlashRank Cross-Encoder Precision│
+└───────────────────────────────────┴────────────────────────────────────┘
+```
+
+### 1. Pillar 1: Anti-Poisoning & Security Guardrails
 Apollo ensures context retrieved from external sources is safe before reaching your LLM:
-1. **Prompt Injection Redaction**: Detects and neutralizes prompt override attempts (`ignore previous instructions`, `system override`, `<<SYS>>`, `<|im_start|>`).
-2. **Invisible Unicode Stripping**: Removes zero-width spaces (`\u200B`), BiDi overrides (`\u202E`), and hidden character exploits.
-3. **Hardened XML Encapsulation**: Encloses external context in `<untrusted_academic_context>` tags with explicit provenance metadata.
+* **Prompt Injection Redaction**: Detects and neutralizes prompt override attempts (`ignore previous instructions`, `system override`, `<<SYS>>`, `<|im_start|>`).
+* **Invisible Unicode Stripping**: Removes zero-width spaces (`\u200B`), BiDi overrides (`\u202E`), and hidden character exploits.
+* **Hardened XML Encapsulation**: Encloses external context in `<untrusted_academic_context>` tags with explicit provenance metadata.
+
+### 2. Pillar 2: Anti-Hallucination & Context-Overload Defense
+Dumping too much unstructured search text into an LLM causes the **"Lost-in-the-Middle" phenomenon** (Stanford / Liu et al.) and leads to **Retrieval-Induced Hallucinations**. Apollo prevents this through:
+* **Adaptive Tool Gating**: The Tool RAG Indexer evaluates semantic fit and **prunes away unneeded tools** (e.g., skips Wikipedia & Web when arXiv matches), preventing redundant multi-source flooding.
+* **Strict Score Thresholding**: Prunes any candidate snippet whose relevance score falls below the cutoff threshold, eliminating distractor noise.
+* **Hard Token Budgeting**: Enforces a strict `2,500`-character context budget to preserve LLM attention density and prevent token bloat.
 
 ---
 
