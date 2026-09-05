@@ -293,14 +293,25 @@ npx @modelcontextprotocol/inspector /opt/anaconda3/envs/apollo/bin/python -m apo
 
 ## 6. Automated Testing & CI/CD Pipeline
 
-Apollo features a 26-case automated Pytest suite covering all pipeline layers:
+Apollo features a 27-case automated Pytest suite covering all pipeline layers:
 
 ```bash
 conda run -n apollo pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 ```
 
 ### GitHub Actions Workflow (`.github/workflows/ci-cd.yml`):
-1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 26 test cases and measures code coverage.
+1. **Test Job**: Runs on `ubuntu-latest` with Python 3.11, validates all 27 test cases and measures code coverage.
 2. **Build & Push Job**: Automatically builds the multi-stage Docker image and pushes to Docker Hub on `main` branch pushes.
 3. **Deploy Job**: Connects to AWS EC2 via SSH and executes `docker compose pull && docker compose up -d`.
+
+---
+
+## 7. Licensing & Attribution
+
+Apollo is dual-licensed under:
+- **Apache License, Version 2.0** ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- **GNU General Public License, Version 3.0 or later** ([LICENSE-GPL](LICENSE-GPL) or https://www.gnu.org/licenses/gpl-3.0.html)
+
+SPDX-License-Identifier: `Apache-2.0 OR GPL-3.0-or-later`
+Copyright (c) 2026 Parth Dhola.
 

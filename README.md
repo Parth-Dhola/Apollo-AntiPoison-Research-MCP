@@ -1,7 +1,7 @@
 # Apollo — Anti-Poisoned Multi-Source Research MCP Server
 
 [![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Apache 2.0 / GPLv3](https://img.shields.io/badge/License-Apache%202.0%20%2F%20GPLv3-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
 [![Tests](https://img.shields.io/badge/tests-26%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
 [![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
@@ -185,8 +185,10 @@ context = asyncio.run(get_clean_research_context("FlashAttention-2 forward backw
 print(context)
 ```
 
----
-
 ## 📜 License
+ 
+Dual-licensed under either of:
+- **Apache License, Version 2.0** ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- **GNU General Public License, Version 3.0 or later** ([LICENSE-GPL](LICENSE-GPL) or https://www.gnu.org/licenses/gpl-3.0.html)
 
-MIT License. Free to use, modify, and distribute. See [LICENSE](LICENSE) for details.
+You may choose either license at your option. (SPDX-License-Identifier: `Apache-2.0 OR GPL-3.0-or-later`).
