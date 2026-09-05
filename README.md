@@ -1,4 +1,4 @@
-# Apollo — Anti-Poisoned Multi-Source Research MCP Server
+# Apollo — Anti-Poison & Anti-Hallucination Multi-Source Research MCP Server
 
 [![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -7,7 +7,7 @@
 [![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
 [![Cost](https://img.shields.io/badge/Cost-%240%20(100%25%20Free)-brightgreen.svg)](#zero-cost-design)
 
-> **Apollo** is a standalone, production-grade Model Context Protocol (MCP) server engineered to provide clean, anti-poisoned, highly-relevant context from academic papers (arXiv, Semantic Scholar), open-source repositories (GitHub), Wikipedia encyclopedia, and web search. Built with zero external API fees in mind.
+> **Apollo** is a standalone, production-grade Model Context Protocol (MCP) server engineered with a **Dual-Pillar Defense**: protecting AI agents from **context poisoning (prompt injection & adversarial attacks)** and **retrieval-induced hallucinations (context overload & "Lost-in-the-Middle")** across academic papers (arXiv, Semantic Scholar), open-source repositories (GitHub), Wikipedia encyclopedia, and web search. Built with $0 external API fees in mind.
 
 ---
 

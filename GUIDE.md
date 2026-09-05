@@ -1,6 +1,6 @@
-# Apollo — Technical Architecture & Operator Manual (v1.0)
+# Apollo — Anti-Poison & Anti-Hallucination Research MCP Server (Technical Architecture & Operator Manual v1.0)
 
-This document serves as the comprehensive engineering guide and operator manual for **Apollo**. It details the internal mechanics of the Multi-Source Ingestion Engine, the 3-layer Context Sanitization and Anti-Poisoning Filter, the Zero-Cost Guardrail RAG and FlashRank CPU Cross-Encoder, the Standalone Bag-of-Words Tool Selector, the FastMCP 4 protocol implementation, and the automated CI/CD pipeline.
+This document serves as the comprehensive engineering guide and operator manual for **Apollo**. It details the internal mechanics of the Dual-Pillar Retrieval Shield: protecting LLMs from **Context Poisoning** (indirect prompt injection, Unicode attacks) and **Retrieval-Induced Hallucination** (context overload, attention dilution, "Lost-in-the-Middle" phenomenon) across the Multi-Source Ingestion Engine, the 3-layer Context Sanitization Filter, the Zero-Cost Guardrail RAG and FlashRank CPU Cross-Encoder, the Tool Capability RAG Indexer, the FastMCP 4 protocol implementation, and the automated CI/CD pipeline.
 
 ---
 

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "apollo-mcp"
 version = "0.1.0"
-description = "Anti-Poisoned Multi-Source Academic & Code Context MCP Server"
+description = "Anti-Poison & Anti-Hallucination Multi-Source Research Context MCP Server"
 readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
 authors = [{name = "Parth Dhola"}]
