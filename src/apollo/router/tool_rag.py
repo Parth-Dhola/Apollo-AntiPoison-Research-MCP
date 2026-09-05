@@ -35,16 +35,17 @@ _TOOL_PROFILES: List[ToolProfile] = [
     ToolProfile(
         name="search_academic_papers",
         description="Search peer-reviewed academic literature, arXiv preprints, citations, methodology, mathematical formulations, and theoretical theorems.",
-        keywords=["paper", "papers", "arxiv", "doi", "theorem", "proof", "ablation", "sota", "survey", "literature", "citations", "loss", "convergence", "attention", "transformer", "diffusion", "latent", "dataset", "benchmark"],
+        keywords=["paper", "papers", "arxiv", "doi", "theorem", "proof", "ablation", "sota", "survey", "literature", "citations", "loss", "convergence", "attention", "flashattention", "transformer", "diffusion", "latent", "dataset", "benchmark", "speed", "forward", "backward", "pass", "gpu", "kernel"],
         sample_queries=[
             "Survey of vision transformers",
             "Convergence proof for Adam optimizer",
             "Attention mechanism mathematical formulation",
-            "Recent papers on diffusion state space models"
+            "Recent papers on diffusion state space models",
+            "How does FlashAttention-2 speed up forward and backward pass?"
         ],
         category="academic",
         token_cost="medium",
-        min_score_threshold=0.30
+        min_score_threshold=0.25
     ),
     ToolProfile(
         name="fetch_paper_deep_context",
@@ -62,7 +63,7 @@ _TOOL_PROFILES: List[ToolProfile] = [
     ToolProfile(
         name="search_repo_implementations",
         description="Search verified GitHub open-source repositories for code snippets, PyTorch / CUDA implementations, models, and scripts.",
-        keywords=["github", "repo", "repository", "code", "implementation", "implement", "pytorch", "torch", "cuda", "script", "snippet", "package", "class", "function", "clone", "fork", "stars", "onnx", "llama.cpp"],
+        keywords=["github", "repo", "repository", "code", "implementation", "implement", "pytorch", "torch", "cuda", "script", "snippet", "package", "class", "function", "clone", "fork", "stars", "onnx", "llama.cpp", "flashattention", "kernel", "gpu", "speed"],
         sample_queries=[
             "PyTorch implementation of LoRA linear layer",
             "CUDA kernel implementation of FlashAttention",
@@ -71,7 +72,7 @@ _TOOL_PROFILES: List[ToolProfile] = [
         ],
         category="code",
         token_cost="medium",
-        min_score_threshold=0.30
+        min_score_threshold=0.25
     ),
     ToolProfile(
         name="search_wikipedia",

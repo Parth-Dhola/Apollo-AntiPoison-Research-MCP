@@ -29,13 +29,15 @@ _STOPWORDS = {
 
 
 def tokenize_query(text: str, remove_stopwords: bool = True) -> List[str]:
-    """Tokenize query string into normalized lowercase terms."""
+    """Tokenize query string into normalized lowercase terms, extracting both whole and subword terms."""
     if not text:
         return []
-    words = re.findall(r"\b[a-zA-Z0-9_-]+\b", text.lower())
+    raw_tokens = re.findall(r"\b[a-zA-Z0-9_-]+\b", text.lower())
+    sub_tokens = re.findall(r"[a-zA-Z0-9]+", text.lower())
+    all_tokens = list(dict.fromkeys(raw_tokens + sub_tokens))
     if remove_stopwords:
-        return [w for w in words if w not in _STOPWORDS and len(w) > 1]
-    return words
+        return [w for w in all_tokens if w not in _STOPWORDS and len(w) > 1]
+    return all_tokens
 
 
 class BM25Ranker:

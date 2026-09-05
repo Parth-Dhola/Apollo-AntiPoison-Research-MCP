@@ -312,20 +312,36 @@ def create_mcp_server() -> FastMCP:
                             "language": item.language
                         }
                     ))
+                elif isinstance(item, dict) and item.get("source") == "wikipedia":
+                    candidates.append(GroundedContextSnippet(
+                        source="wikipedia",
+                        title=item["title"],
+                        url=item["url"],
+                        content=f"{item.get('description', '')}\n\n{item['content']}".strip(),
+                        citation_meta={"source": "wikipedia"}
+                    ))
 
         if not candidates:
-            # Graceful fallback to web search
-            ddg_results = search_duckduckgo(query, max_results=top_k)
-            candidates = [
-                GroundedContextSnippet(
-                    source="web",
-                    title=r["title"],
-                    url=r["url"],
-                    content=r["content"],
-                    citation_meta={"engine": "duckduckgo"}
-                )
-                for r in ddg_results
-            ]
+            # Resilient multi-tier fallback: Wikipedia + arXiv + DDG
+            wiki_res = await search_wikipedia_fn(query, max_results=top_k)
+            for w in wiki_res:
+                candidates.append(GroundedContextSnippet(
+                    source="wikipedia",
+                    title=w["title"],
+                    url=w["url"],
+                    content=f"{w.get('description', '')}\n\n{w['content']}".strip(),
+                    citation_meta={"source": "wikipedia"}
+                ))
+            if not candidates:
+                arxiv_res = await search_arxiv(query, max_results=top_k)
+                for a in arxiv_res:
+                    candidates.append(GroundedContextSnippet(
+                        source="arxiv",
+                        title=a.title,
+                        url=a.url,
+                        content=a.abstract,
+                        citation_meta={"arxiv_id": a.arxiv_id, "year": a.year}
+                    ))
 
         # Rerank with FlashRank/BM25 & enforce token budget
         ranked = rank_snippets(query, candidates, top_k=top_k)
