@@ -199,8 +199,8 @@ Built on **FastMCP 4.0** implementing the Model Context Protocol:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP.git
-cd Apollo-AntiPoison-Research-MCP
+git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-AntiHallucination-Research-MCP.git
+cd Apollo-AntiPoison-AntiHallucination-Research-MCP
 
 # 2. Create and activate conda environment
 conda create -n apollo python=3.11 -y

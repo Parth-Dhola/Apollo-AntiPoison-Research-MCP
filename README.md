@@ -1,9 +1,9 @@
 # Apollo — Anti-Poison & Anti-Hallucination Multi-Source Research MCP Server
 
-[![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-AntiHallucination-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-AntiHallucination-Research-MCP/actions)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
-[![Tests](https://img.shields.io/badge/tests-27%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![Tests](https://img.shields.io/badge/tests-27%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-AntiHallucination-Research-MCP/actions)
 [![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
 [![Cost](https://img.shields.io/badge/Cost-%240%20(100%25%20Free)-brightgreen.svg)](#zero-cost-design)
 
@@ -71,8 +71,8 @@ Apollo was designed specifically for students and researchers:
 ### 1. Installation
 
 ```bash
-git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP.git
-cd Apollo-AntiPoison-Research-MCP
+git clone https://github.com/Parth-Dhola/Apollo-AntiPoison-AntiHallucination-Research-MCP.git
+cd Apollo-AntiPoison-AntiHallucination-Research-MCP
 
 # Create conda environment
 conda create -n apollo python=3.11 -y
