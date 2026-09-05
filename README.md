@@ -1,9 +1,9 @@
 # Apollo — Anti-Poisoned Multi-Source Research MCP Server
 
 [![CI/CD](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
-[![License: Apache 2.0 / GPLv3](https://img.shields.io/badge/License-Apache%202.0%20%2F%20GPLv3-blue.svg)](LICENSE)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org)
-[![Tests](https://img.shields.io/badge/tests-26%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
+[![Tests](https://img.shields.io/badge/tests-27%20passed-brightgreen.svg)](https://github.com/Parth-Dhola/Apollo-AntiPoison-Research-MCP/actions)
 [![MCP](https://img.shields.io/badge/Protocol-MCP%201.0-orange.svg)](https://modelcontextprotocol.io)
 [![Cost](https://img.shields.io/badge/Cost-%240%20(100%25%20Free)-brightgreen.svg)](#zero-cost-design)
 
@@ -187,8 +187,6 @@ print(context)
 
 ## 📜 License
  
-Dual-licensed under either of:
-- **Apache License, Version 2.0** ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- **GNU General Public License, Version 3.0 or later** ([LICENSE-GPL](LICENSE-GPL) or https://www.gnu.org/licenses/gpl-3.0.html)
+Licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**.
 
-You may choose either license at your option. (SPDX-License-Identifier: `Apache-2.0 OR GPL-3.0-or-later`).
+All derivative software and modifications must remain open-source under GPLv3. See the [LICENSE](LICENSE) file for the full license text.

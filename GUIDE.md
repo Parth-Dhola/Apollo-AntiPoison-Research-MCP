@@ -308,10 +308,10 @@ conda run -n apollo pytest tests/ -v --cov=src/apollo --cov-report=term-missing
 
 ## 7. Licensing & Attribution
 
-Apollo is dual-licensed under:
-- **Apache License, Version 2.0** ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- **GNU General Public License, Version 3.0 or later** ([LICENSE-GPL](LICENSE-GPL) or https://www.gnu.org/licenses/gpl-3.0.html)
+Apollo is licensed under the **GNU General Public License, Version 3.0 or later (GPL-3.0-or-later)**.
 
-SPDX-License-Identifier: `Apache-2.0 OR GPL-3.0-or-later`
+All derivative works, modifications, and integrations must remain open-source under GPLv3.
+
+SPDX-License-Identifier: `GPL-3.0-or-later`  
 Copyright (c) 2026 Parth Dhola.
 
